@@ -80,6 +80,7 @@ fun LoginScreen(onEnterClick: (User) -> Unit) {
                 style = TextStyle(
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
+                    color = Color.Black
                 )
             )
 
@@ -95,6 +96,7 @@ fun LoginScreen(onEnterClick: (User) -> Unit) {
                     unfocusedContainerColor = Color.White,
                     focusedContainerColor = Color.White,
                     focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
                     focusedIndicatorColor = Color.Black
                 ),
                 textStyle = TextStyle(
