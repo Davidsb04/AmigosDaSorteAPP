@@ -1,6 +1,7 @@
 package br.com.amigosdasorte.model
 
-data class SignInModel(
+
+data class LoginRequest(
     val email : String,
     val password : String
 )
