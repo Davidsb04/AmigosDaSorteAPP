@@ -13,8 +13,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.navigation.compose.rememberNavController
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -27,19 +30,29 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import br.com.amigosdasorte.model.SignInModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import br.com.amigosdasorte.ui.theme.AmigosDaSorteAPPTheme
 import br.com.amigosdasorte.ui.theme.DefaultButtonTextStyle
 import br.com.amigosdasorte.ui.theme.DefaultTextFieldLabelStyle
 import br.com.amigosdasorte.ui.theme.DefaultTextFieldTextStyle
 import br.com.amigosdasorte.ui.theme.defaultButtonColors
 import br.com.amigosdasorte.ui.theme.defaultTextFieldColors
+import br.com.amigosdasorte.ui.viewmodel.LoginViewModel
 
 @Composable
 fun SignIn(
-    /*onSignInClick: (SignInModel) -> Unit,*/
-    onSignUpClick: () -> Unit
+    navController: NavController,
+    loginViewModel: LoginViewModel,
+    onSignUpClick: () -> Unit,
 ) {
+    val loginSuccess by loginViewModel.loginSuccess.observeAsState()
+    val loginErrorMessage by loginViewModel.loginErrorMessage.observeAsState()
+
+    var showError by remember { mutableStateOf(false) }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
     Column(
         Modifier
             .background(color = Color(0xFFFFFFFF))
@@ -47,15 +60,6 @@ fun SignIn(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        var email by remember {
-            mutableStateOf("")
-        }
-
-        var password by remember {
-            mutableStateOf("")
-        }
-
-
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -108,12 +112,7 @@ fun SignIn(
 
             Button(
                 onClick = {
-                    /*onSignInClick(
-                        SignInModel(
-                            email,
-                            password
-                        )
-                    )*/
+                    loginViewModel.login(email, password)
                 },
                 Modifier
                     .padding(8.dp, 0.dp, 8.dp, 0.dp)
@@ -140,6 +139,30 @@ fun SignIn(
                     color = Color.Black
                 )
             }
+
+            when{
+                loginSuccess == true -> {
+                    navController.navigate("main")
+                }
+                loginErrorMessage != null -> {
+                    showError = true
+                    LaunchedEffect(Unit) {
+                        kotlinx.coroutines.delay(4000)
+                        showError = false
+                        loginViewModel.clearLoginResult()
+                    }
+                }
+            }
+
+            if (showError) {
+                Text(
+                    text = loginErrorMessage!!,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Red,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+            }
         }
     }
 }
@@ -153,8 +176,9 @@ fun SignInPreview() {
             color = MaterialTheme.colorScheme.background
         ) {
             SignIn(
-                //onSignInClick = {},
-                onSignUpClick = {}
+                navController = rememberNavController(),
+                loginViewModel = viewModel(),
+                onSignUpClick = {},
             )
         }
     }
