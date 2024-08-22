@@ -12,10 +12,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import br.com.amigosdasorte.ui.screens.Main
+import br.com.amigosdasorte.ui.screens.MainScreen
 import br.com.amigosdasorte.ui.screens.SignIn
 import br.com.amigosdasorte.ui.screens.SignUp
 import br.com.amigosdasorte.ui.theme.AmigosDaSorteAPPTheme
+import br.com.amigosdasorte.ui.viewmodel.AccountViewModel
 import br.com.amigosdasorte.ui.viewmodel.LoginViewModel
 
 class MainActivity : ComponentActivity() {
@@ -30,20 +31,24 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val navController = rememberNavController()
                     val loginViewModel: LoginViewModel = viewModel()
+                    val accountViewModel: AccountViewModel = viewModel()
+
 
                     NavHost(navController = navController, startDestination = "signIn") {
                         composable("signIn") {
                             SignIn(
                                 navController = navController,
                                 loginViewModel = loginViewModel,
-                                onSignUpClick = { navController.navigate("signUp") },
                             )
                         }
                         composable("signUp") {
-                            SignUp()
+                            SignUp(
+                                navController = navController,
+                                accountViewModel = accountViewModel,
+                            )
                         }
                         composable("main") {
-                            Main()
+                            MainScreen()
                         }
                     }
                 }
