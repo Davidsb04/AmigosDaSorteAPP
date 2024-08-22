@@ -4,9 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import br.com.amigosdasorte.model.ApiService
-import br.com.amigosdasorte.model.LoginRequest
-import br.com.amigosdasorte.model.LoginResponse
+import br.com.amigosdasorte.model.SignInRequest
+import br.com.amigosdasorte.model.APIResponse
 import br.com.amigosdasorte.util.RetrofitClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,25 +23,31 @@ class LoginViewModel : ViewModel() {
 
     fun login(email: String, password: String) {
         val apiService = RetrofitClient.apiService
-        val loginRequest = LoginRequest(email, password)
+        val signInRequest = SignInRequest(email, password)
 
         viewModelScope.launch(Dispatchers.IO) {
-            val call = apiService.login(loginRequest)
-            call.enqueue(object : Callback<LoginResponse> {
+            val call = apiService.login(signInRequest)
+            call.enqueue(object : Callback<APIResponse> {
                 override fun onResponse(
-                    call: Call<LoginResponse>,
-                    response: Response<LoginResponse>
+                    call: Call<APIResponse>,
+                    response: Response<APIResponse>
                 ) {
-                    if (response.isSuccessful) {
-                        _loginSuccess.postValue(true)
-                        _loginErrorMessage.postValue(null)
-                    } else {
+                    if (response.code() == 400) {
+                        _loginSuccess.postValue(false)
+                        _loginErrorMessage.postValue("Insira todos os campos.")
+                    } else if(response.code() == 401 || response.code() == 404) {
                         _loginSuccess.postValue(false)
                         _loginErrorMessage.postValue("E-mail ou senha incorretos.")
+                    } else if (response.code() == 500){
+                        _loginSuccess.postValue(false)
+                        _loginErrorMessage.postValue("Não foi possível efetuar o login.")
+                    } else{
+                        _loginSuccess.postValue(true)
+                        _loginErrorMessage.postValue(null)
                     }
                 }
 
-                override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+                override fun onFailure(call: Call<APIResponse>, t: Throwable) {
                     _loginSuccess.postValue(false)
                     _loginErrorMessage.postValue("Erro de rede: ${t.message}")
                 }

@@ -12,7 +12,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -25,16 +27,32 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import br.com.amigosdasorte.model.SignUpModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import br.com.amigosdasorte.ui.theme.AmigosDaSorteAPPTheme
 import br.com.amigosdasorte.ui.theme.DefaultButtonTextStyle
 import br.com.amigosdasorte.ui.theme.DefaultTextFieldLabelStyle
 import br.com.amigosdasorte.ui.theme.DefaultTextFieldTextStyle
 import br.com.amigosdasorte.ui.theme.defaultButtonColors
 import br.com.amigosdasorte.ui.theme.defaultTextFieldColors
+import br.com.amigosdasorte.ui.viewmodel.AccountViewModel
 
 @Composable
-fun SignUp(/*onSignUpClick: (SignUpModel) -> Unit*/) {
+fun SignUp(
+    navController: NavController,
+    accountViewModel: AccountViewModel
+) {
+    val signUpSuccess by accountViewModel.signUpSuccess.observeAsState()
+    val signUpErrorMessage by accountViewModel.signUpErrorMessage.observeAsState()
+
+    var showError by remember { mutableStateOf(false) }
+    var email by remember { mutableStateOf("")}
+    var name by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
+
     Column(
         Modifier
             .background(color = Color(0xFFFFFFFF))
@@ -42,22 +60,6 @@ fun SignUp(/*onSignUpClick: (SignUpModel) -> Unit*/) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        var email by remember {
-            mutableStateOf("")
-        }
-
-        var name by remember {
-            mutableStateOf("")
-        }
-
-        var username by remember {
-            mutableStateOf("")
-        }
-
-        var password by remember {
-            mutableStateOf("")
-        }
-
 
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -147,14 +149,7 @@ fun SignUp(/*onSignUpClick: (SignUpModel) -> Unit*/) {
 
             Button(
                 onClick = {
-                    /*onSignUpClick(
-                        SignUpModel(
-                            email,
-                            name,
-                            username,
-                            password
-                        )
-                    )*/
+                    accountViewModel.createUser(email, name, username, password)
                 },
                 Modifier
                     .padding(8.dp, 0.dp, 8.dp, 0.dp)
@@ -165,6 +160,30 @@ fun SignUp(/*onSignUpClick: (SignUpModel) -> Unit*/) {
                 Text(
                     text = "Cadastrar",
                     style = DefaultButtonTextStyle
+                )
+            }
+
+            when{
+                signUpSuccess == true -> {
+                    navController.navigate("signIn")
+                }
+                signUpErrorMessage != null ->{
+                    showError = true
+                    LaunchedEffect(Unit) {
+                        kotlinx.coroutines.delay(4000)
+                        showError = false
+                        accountViewModel.clearCreateUserResult()
+                    }
+                }
+            }
+
+            if (showError){
+                Text(
+                    text = signUpErrorMessage!!,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Red,
+                    modifier = Modifier.padding(top = 8.dp)
                 )
             }
         }
@@ -179,7 +198,10 @@ fun SignUpPreview() {
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            SignUp(/*onSignUpClick = {}*/)
+            SignUp(
+                navController = rememberNavController(),
+                accountViewModel =  viewModel()
+            )
         }
     }
 }

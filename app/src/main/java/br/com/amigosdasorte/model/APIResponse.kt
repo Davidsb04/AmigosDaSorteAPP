@@ -1,5 +1,5 @@
 package br.com.amigosdasorte.model
 
-data class LoginResponse(
+data class APIResponse(
     val message: String
 )

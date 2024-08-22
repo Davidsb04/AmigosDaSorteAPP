@@ -7,5 +7,8 @@ import retrofit2.http.POST
 
 interface ApiService {
     @POST("login/login")
-    fun login(@Body loginRequest: LoginRequest): Call<LoginResponse>
+    fun login(@Body signInRequest: SignInRequest): Call<APIResponse>
+
+    @POST("account/create_user")
+    fun createUser(@Body signUpRequest: SignUpRequest): Call<APIResponse>
 }

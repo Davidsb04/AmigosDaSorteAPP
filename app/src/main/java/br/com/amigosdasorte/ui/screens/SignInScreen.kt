@@ -44,7 +44,6 @@ import br.com.amigosdasorte.ui.viewmodel.LoginViewModel
 fun SignIn(
     navController: NavController,
     loginViewModel: LoginViewModel,
-    onSignUpClick: () -> Unit,
 ) {
     val loginSuccess by loginViewModel.loginSuccess.observeAsState()
     val loginErrorMessage by loginViewModel.loginErrorMessage.observeAsState()
@@ -127,7 +126,8 @@ fun SignIn(
             }
 
             TextButton(onClick = {
-                onSignUpClick() },
+                    navController.navigate("signUp")
+                 },
                 Modifier
                     .padding(4.dp)
                     .fillMaxWidth()
@@ -160,7 +160,7 @@ fun SignIn(
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Red,
-                    modifier = Modifier.padding(top = 16.dp)
+                    modifier = Modifier.padding(top = 8.dp)
                 )
             }
         }
@@ -178,7 +178,6 @@ fun SignInPreview() {
             SignIn(
                 navController = rememberNavController(),
                 loginViewModel = viewModel(),
-                onSignUpClick = {},
             )
         }
     }
