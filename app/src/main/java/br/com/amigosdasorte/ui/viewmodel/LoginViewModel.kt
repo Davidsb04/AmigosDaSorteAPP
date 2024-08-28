@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.com.amigosdasorte.model.SignInRequest
 import br.com.amigosdasorte.model.APIResponse
-import br.com.amigosdasorte.util.RetrofitClient
+import br.com.amigosdasorte.util.apiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -15,14 +15,13 @@ import retrofit2.Response
 
 class LoginViewModel : ViewModel() {
 
-    private val _loginSuccess = MutableLiveData<Boolean>()
-    val loginSuccess: LiveData<Boolean> get() = _loginSuccess
+    private val _responseSuccess = MutableLiveData<Boolean>()
+    val responseSuccess: LiveData<Boolean> get() = _responseSuccess
 
-    private val _loginErrorMessage = MutableLiveData<String?>()
-    val loginErrorMessage: LiveData<String?> get() = _loginErrorMessage
+    private val _responseErrorMessage = MutableLiveData<String?>()
+    val responseErrorMessage: LiveData<String?> get() = _responseErrorMessage
 
     fun login(email: String, password: String) {
-        val apiService = RetrofitClient.apiService
         val signInRequest = SignInRequest(email, password)
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -33,29 +32,29 @@ class LoginViewModel : ViewModel() {
                     response: Response<APIResponse>
                 ) {
                     if (response.code() == 400) {
-                        _loginSuccess.postValue(false)
-                        _loginErrorMessage.postValue("Insira todos os campos.")
+                        _responseSuccess.postValue(false)
+                        _responseErrorMessage.postValue("Insira todos os campos.")
                     } else if(response.code() == 401 || response.code() == 404) {
-                        _loginSuccess.postValue(false)
-                        _loginErrorMessage.postValue("E-mail ou senha incorretos.")
+                        _responseSuccess.postValue(false)
+                        _responseErrorMessage.postValue("E-mail ou senha incorretos.")
                     } else if (response.code() == 500){
-                        _loginSuccess.postValue(false)
-                        _loginErrorMessage.postValue("Não foi possível efetuar o login.")
+                        _responseSuccess.postValue(false)
+                        _responseErrorMessage.postValue("Não foi possível efetuar o login.")
                     } else{
-                        _loginSuccess.postValue(true)
-                        _loginErrorMessage.postValue(null)
+                        _responseSuccess.postValue(true)
+                        _responseErrorMessage.postValue(null)
                     }
                 }
 
                 override fun onFailure(call: Call<APIResponse>, t: Throwable) {
-                    _loginSuccess.postValue(false)
-                    _loginErrorMessage.postValue("Erro de rede: ${t.message}")
+                    _responseSuccess.postValue(false)
+                    _responseErrorMessage.postValue("Erro de rede: ${t.message}")
                 }
             })
         }
     }
 
     fun clearLoginResult() {
-        _loginErrorMessage.value = null
+        _responseErrorMessage.value = null
     }
 }

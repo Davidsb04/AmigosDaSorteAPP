@@ -33,7 +33,6 @@ class MainActivity : ComponentActivity() {
                     val loginViewModel: LoginViewModel = viewModel()
                     val accountViewModel: AccountViewModel = viewModel()
 
-
                     NavHost(navController = navController, startDestination = "signIn") {
                         composable("signIn") {
                             SignIn(
