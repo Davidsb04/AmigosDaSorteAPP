@@ -43,8 +43,8 @@ fun SignUp(
     navController: NavController,
     accountViewModel: AccountViewModel
 ) {
-    val signUpSuccess by accountViewModel.signUpSuccess.observeAsState()
-    val signUpErrorMessage by accountViewModel.signUpErrorMessage.observeAsState()
+    val signUpSuccess by accountViewModel.responseSuccess.observeAsState()
+    val signUpErrorMessage by accountViewModel.responseErrorMessage.observeAsState()
 
     var showError by remember { mutableStateOf(false) }
     var email by remember { mutableStateOf("")}
@@ -170,7 +170,7 @@ fun SignUp(
                 signUpErrorMessage != null ->{
                     showError = true
                     LaunchedEffect(Unit) {
-                        kotlinx.coroutines.delay(4000)
+                        kotlinx.coroutines.delay(2000)
                         showError = false
                         accountViewModel.clearCreateUserResult()
                     }

@@ -45,8 +45,8 @@ fun SignIn(
     navController: NavController,
     loginViewModel: LoginViewModel,
 ) {
-    val loginSuccess by loginViewModel.loginSuccess.observeAsState()
-    val loginErrorMessage by loginViewModel.loginErrorMessage.observeAsState()
+    val loginSuccess by loginViewModel.responseSuccess.observeAsState()
+    val loginErrorMessage by loginViewModel.responseErrorMessage.observeAsState()
 
     var showError by remember { mutableStateOf(false) }
     var email by remember { mutableStateOf("") }
@@ -147,7 +147,7 @@ fun SignIn(
                 loginErrorMessage != null -> {
                     showError = true
                     LaunchedEffect(Unit) {
-                        kotlinx.coroutines.delay(4000)
+                        kotlinx.coroutines.delay(2000)
                         showError = false
                         loginViewModel.clearLoginResult()
                     }
